@@ -1,0 +1,21 @@
+import 'package:flutter/material.dart';
+import 'package:my_project/screens/login_screen.dart';
+
+void main(){
+  runApp(MyWidget());
+}
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: LoginScreen(),
+      theme: ThemeData(),
+      darkTheme: ThemeData(),
+      color: Colors.amber,
+      
+    );
+  }
+}
