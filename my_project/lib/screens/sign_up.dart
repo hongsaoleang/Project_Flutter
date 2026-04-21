@@ -16,7 +16,6 @@ class SignUp extends StatelessWidget {
               "assets/images/cinema_logo.png",
               height: 100,
             ),
-
             const SizedBox(height: 20),
 
             // Title
