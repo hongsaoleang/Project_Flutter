@@ -6,38 +6,140 @@ class SignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Center(
-            child: Container(
-              height: 200,
-              width: 200,
-                child: Image.asset("assets/images/cinema_logo.png"),
+      backgroundColor: const Color(0xFF0D0F2C), // dark background
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Logo
+            Image.asset(
+              "assets/images/cinema_logo.png",
+              height: 100,
             ),
-          ), 
-          Center(
-            child: Text("CINEMA", style: TextStyle(fontSize: 28),),
-          ), 
-          Center(
-            child: Text("Enter Your Registered "),
-          ),
-          Center(
-            child: Text("Phone Number To Sign Up"),
-          ), 
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              height: 60,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.lightBlue, 
-                borderRadius: BorderRadius.circular(20)
-              ),
-              child: Center(child: Text("Sign Up", style: TextStyle(color: Colors.white),)),
-            ),
-          )
 
-        ],
+            const SizedBox(height: 20),
+
+            // Title
+            const Text(
+              "CINEMAX",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Subtitle
+            const Text(
+              "Enter your registered",
+              style: TextStyle(color: Colors.grey),
+            ),
+            const Text(
+              "Phone Number to Sign Up",
+              style: TextStyle(color: Colors.grey),
+            ),
+
+            const SizedBox(height: 40),
+
+            // Sign Up Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Container(
+                height: 55,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.cyan,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const Center(
+                  child: Text(
+                    "Sign Up",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Login Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  "I already have an account? ",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                Text(
+                  "Login",
+                  style: TextStyle(
+                    color: Colors.cyan,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 30),
+
+            // Divider with text
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Row(
+                children: const [
+                  Expanded(
+                    child: Divider(color: Colors.grey),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      "Or Sign up with",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  Expanded(
+                    child: Divider(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // Social Icons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                socialButton("assets/images/google_icons.png"),
+                const SizedBox(width: 20),
+                socialButton("assets/images/apple_icons.png"),
+                const SizedBox(width: 20),
+                socialButton("assets/images/fb_icons.png"),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget socialButton(String path) {
+    return Container(
+      height: 70,
+      width: 70,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1C1F3A),
+        shape: BoxShape.circle,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Image.asset(path),
       ),
     );
   }
