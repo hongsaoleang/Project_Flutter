@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:my_project/screens/authentication/choice.dart';
+import 'package:my_project/screens/authentication/login_screen.dart';
 import 'package:my_project/screens/detail/detail_page.dart';
 
 void main() {
@@ -13,7 +15,7 @@ class MyWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MovieDetailScreen(),
+      home: Choice(),
       theme: ThemeData(),
       darkTheme: ThemeData(),
       color: Colors.amber,

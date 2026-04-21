@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/state_manager.dart';
+import 'package:my_project/model/data.dart';
 import 'package:my_project/screens/home/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -11,6 +14,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
+  // Controllers to capture user input
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -44,6 +48,14 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             const SizedBox(height: 40),
+            const Text(
+              "Hi, Tiffany",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             const Text(
               "Welcome back! Please enter\nyour details.",
@@ -61,7 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 20),
 
             // Password Field
-            // Setting obscureText to true automatically makes it dynamic (1 dot per letter)
             _buildInputField(
               label: "Password",
               hint: "•••••••••••••••••",
@@ -92,12 +103,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
             const SizedBox(height: 30),
 
+            // Login Button
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+                  final userData = Data(
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                    username: "Hong Saoleang",
+                  );
+
+                  Get.to(HomeScreen());
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00E5FF),
@@ -105,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child:  Text(
+                child: const Text(
                   "Login",
                   style: TextStyle(
                     color: Colors.white,
@@ -136,7 +154,6 @@ class _LoginScreenState extends State<LoginScreen> {
         TextField(
           controller: controller,
           obscureText: isPassword ? _obscurePassword : false,
-          // This ensures the character used for masking is a clean dot
           obscuringCharacter: '•',
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
