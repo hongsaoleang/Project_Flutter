@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:my_project/screens/detail/detail_page.dart';
 import 'package:my_project/screens/home/home_screen.dart';
 import 'package:my_project/screens/login_screen.dart';
+import 'package:my_project/screens/search/search_page.dart';
 import 'package:my_project/screens/sign_up.dart';
 
 void main(){
@@ -11,9 +14,9 @@ class MyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: MovieDetailScreen(),
       theme: ThemeData(),
       darkTheme: ThemeData(),
       color: Colors.amber,
