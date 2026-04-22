@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
-import 'package:my_project/model/data.dart';
+import 'package:my_project/model/auth_data.dart';
 import 'package:my_project/screens/home/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,15 +13,19 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
+  bool _isloading = false;
 
   // Controllers to capture user input
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _phoneController =
+      TextEditingController(); // New Controller
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _phoneController.dispose(); // Dispose new controller
     super.dispose();
   }
 
@@ -64,11 +68,18 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 40),
 
-            // Email Field
             _buildInputField(
               label: "Email Address",
               hint: "hongsaoleang@gmail.com",
               controller: _emailController,
+            ),
+            const SizedBox(height: 20),
+
+            _buildInputField(
+              label: "Phone Number",
+              hint: "012 345 678",
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 20),
 
@@ -108,29 +119,49 @@ class _LoginScreenState extends State<LoginScreen> {
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: () {
-                  final userData = Data(
-                    email: _emailController.text,
-                    password: _passwordController.text,
-                    username: "Hong Saoleang",
-                  );
+                onPressed: _isloading
+                    ? null
+                    : () async {
+                        setState(() => _isloading = true);
 
-                  Get.to(HomeScreen());
-                },
+                        // Small delay for realism
+                        await Future.delayed(const Duration(milliseconds: 500));
+
+                        final userData = AuthData(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                          username: "Hong Saoleang",
+                          phone: _phoneController
+                              .text, 
+                        );
+                        Get.off(() => const HomeScreen(), arguments: userData);
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00E5FF),
+                  disabledBackgroundColor: const Color(
+                    0xFF00E5FF,
+                  ).withOpacity(0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text(
-                  "Login",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: _isloading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        "Login",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
           ],
@@ -145,6 +176,8 @@ class _LoginScreenState extends State<LoginScreen> {
     bool isPassword = false,
     Widget? suffix,
     TextEditingController? controller,
+    TextInputType keyboardType =
+        TextInputType.text, // Added optional keyboard type
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,6 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 8),
         TextField(
           controller: controller,
+          keyboardType: keyboardType,
           obscureText: isPassword ? _obscurePassword : false,
           obscuringCharacter: '•',
           style: const TextStyle(color: Colors.white),
