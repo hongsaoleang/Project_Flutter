@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:my_project/screens/authentication/auth_screen/signup_screen.dart';
 import 'package:my_project/screens/authentication/login_screen.dart';
-import 'package:my_project/screens/authentication/sign_up.dart';
 
 class Choice extends StatelessWidget {
   const Choice({super.key});
@@ -46,7 +46,7 @@ class Choice extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SignUp()),
+                    MaterialPageRoute(builder: (context) => SignUpScreen()),
                   );
                 },
                 child: Container(

@@ -1,48 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/state_manager.dart';
-import 'package:my_project/model/auth_data.dart';
-import 'package:my_project/screens/home/home_screen.dart';
+import 'auth_controller/login_controller.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  bool _obscurePassword = true;
-  bool _isloading = false;
-
-  // Controllers to capture user input
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _phoneController =
-      TextEditingController(); // New Controller
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _phoneController.dispose(); // Dispose new controller
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // Inject the controller
+    final controller = Get.put(LoginController());
+
     return Scaffold(
       backgroundColor: const Color(0xFF1D1D27),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-            size: 20,
-          ),
+          onPressed: () => Get.back(),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
         ),
         title: const Text("Login", style: TextStyle(color: Colors.white)),
         centerTitle: true,
@@ -52,133 +27,97 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             const SizedBox(height: 40),
-            const Text(
-              "Hi, Tiffany",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              "Welcome back! Please enter\nyour details.",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
+            _buildHeader(),
             const SizedBox(height: 40),
 
-            _buildInputField(
+            // EMAIL FIELD
+            _CustomInputField(
               label: "Email Address",
-              hint: "hongsaoleang@gmail.com",
-              controller: _emailController,
+              hint: "yourname@gmail.com",
+              controller: controller.emailController,
+              keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 20),
 
-            _buildInputField(
-              label: "Phone Number",
-              hint: "012 345 678",
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-            ),
-            const SizedBox(height: 20),
-
-            // Password Field
-            _buildInputField(
+            // PASSWORD FIELD
+            Obx(() => _CustomInputField(
               label: "Password",
-              hint: "•••••••••••••••••",
-              isPassword: true,
-              controller: _passwordController,
+              hint: "••••••••",
+              isPassword: controller.obscurePassword.value,
+              controller: controller.passwordController,
               suffix: IconButton(
                 icon: Icon(
-                  _obscurePassword
-                      ? Icons.visibility_off_outlined
+                  controller.obscurePassword.value 
+                      ? Icons.visibility_off_outlined 
                       : Icons.visibility_outlined,
                   color: Colors.grey,
                 ),
-                onPressed: () =>
-                    setState(() => _obscurePassword = !_obscurePassword),
+                onPressed: () => controller.obscurePassword.toggle(),
               ),
-            ),
+            )),
 
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {},
-                child: const Text(
-                  "Forgot Password?",
-                  style: TextStyle(color: Colors.cyanAccent),
-                ),
-              ),
-            ),
-
+            _buildForgotPassword(),
             const SizedBox(height: 30),
 
-            // Login Button
-            SizedBox(
+            // LOGIN BUTTON
+            Obx(() => SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: _isloading
-                    ? null
-                    : () async {
-                        setState(() => _isloading = true);
-
-                        // Small delay for realism
-                        await Future.delayed(const Duration(milliseconds: 500));
-
-                        final userData = AuthData(
-                          email: _emailController.text,
-                          password: _passwordController.text,
-                          username: "Hong Saoleang",
-                          phone: _phoneController
-                              .text, 
-                        );
-                        Get.off(() => const HomeScreen(), arguments: userData);
-                      },
+                onPressed: controller.isLoading.value ? null : () => controller.loginUser(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00E5FF),
-                  disabledBackgroundColor: const Color(
-                    0xFF00E5FF,
-                  ).withOpacity(0.5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
-                child: _isloading
+                child: controller.isLoading.value
                     ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
+                        height: 20, width: 20,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                       )
                     : const Text(
                         "Login",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                       ),
               ),
-            ),
+            )),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInputField({
-    required String label,
-    required String hint,
-    bool isPassword = false,
-    Widget? suffix,
-    TextEditingController? controller,
-    TextInputType keyboardType =
-        TextInputType.text, // Added optional keyboard type
-  }) {
+  Widget _buildHeader() => const Column(
+    children: [
+      Text("Welcome Back", style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+      SizedBox(height: 8),
+      Text("Please enter your details\nto continue.", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 16)),
+    ],
+  );
+
+  Widget _buildForgotPassword() => Align(
+    alignment: Alignment.centerRight,
+    child: TextButton(
+      onPressed: () {}, // Add forgot password logic here later
+      child: const Text("Forgot Password?", style: TextStyle(color: Colors.cyanAccent)),
+    ),
+  );
+}
+
+// Reusable Input Component for a "Power Structure"
+class _CustomInputField extends StatelessWidget {
+  final String label, hint;
+  final bool isPassword;
+  final Widget? suffix;
+  final TextEditingController controller;
+  final TextInputType keyboardType;
+
+  const _CustomInputField({
+    required this.label, required this.hint, required this.controller,
+    this.isPassword = false, this.suffix, this.keyboardType = TextInputType.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -187,8 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
         TextField(
           controller: controller,
           keyboardType: keyboardType,
-          obscureText: isPassword ? _obscurePassword : false,
-          obscuringCharacter: '•',
+          obscureText: isPassword,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: hint,
@@ -196,10 +134,6 @@ class _LoginScreenState extends State<LoginScreen> {
             filled: true,
             fillColor: Colors.white.withOpacity(0.05),
             suffixIcon: suffix,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 18,
-            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: const BorderSide(color: Colors.white10),

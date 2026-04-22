@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart'; // Make sure to import your LoginScreen file
+import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_project/screens/authentication/login_screen.dart';
+import 'package:my_project/screens/home/home_screen.dart';
+
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -10,6 +15,87 @@ class SignUp extends StatefulWidget {
 class _SignUpScreenState extends State<SignUp> {
   bool _isAgreed = false;
   bool _obscurePassword = true;
+  bool _isLoading = false;
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  // --- Firebase Sign Up Logic ---
+  Future<void> _handleSignUp() async {
+    // 1. Validations
+    if (!_isAgreed) {
+      Get.snackbar(
+        "Notice",
+        "Please agree to the Terms and Services",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orangeAccent,
+      );
+      return;
+    }
+    if (_emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _usernameController.text.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "All fields are required",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // 2. Create User in Firebase Auth
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+
+      // 3. Save additional details to Firestore
+      await FirebaseFirestore.instance
+          .collection('auth')
+          .doc(userCredential.user!.uid)
+          .set({
+            'username': _usernameController.text.trim(),
+            'email': _emailController.text.trim(),
+            'phone': _phoneController.text.trim(),
+            'uid': userCredential.user!.uid,
+            'createdAt': DateTime.now(),
+          });
+
+      setState(() => _isLoading = false);
+
+      // 4. Navigate to Home
+      Get.offAll(() => const HomeScreen());
+    } on FirebaseAuthException catch (e) {
+      setState(() => _isLoading = false);
+      Get.snackbar(
+        "Sign Up Failed",
+        e.message ?? "An error occurred",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      setState(() => _isLoading = false);
+      Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +115,11 @@ class _SignUpScreenState extends State<SignUp> {
         title: const Text("Sign Up", style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
             const Text(
               "Let's get started",
               style: TextStyle(
@@ -49,21 +134,33 @@ class _SignUpScreenState extends State<SignUp> {
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey, fontSize: 16),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
 
-            _buildTextField(label: "Full Name", hint: "Hong Saoleang"),
-            const SizedBox(height: 20),
-
+            _buildTextField(
+              label: "Full Name",
+              hint: "Hong Saoleang",
+              con: _usernameController,
+            ),
+            const SizedBox(height: 15),
             _buildTextField(
               label: "Email Address",
               hint: "hongsaoleang@gmail.com",
+              con: _emailController,
+              keyboardType: TextInputType.emailAddress,
             ),
-            const SizedBox(height: 20),
-
+            const SizedBox(height: 15),
+            _buildTextField(
+              label: "Phone Number",
+              hint: "012 345 678",
+              con: _phoneController,
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 15),
             _buildTextField(
               label: "Password",
               hint: "•••••••••••••••••",
               isPassword: true,
+              con: _passwordController,
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscurePassword
@@ -76,23 +173,22 @@ class _SignUpScreenState extends State<SignUp> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
             Row(
               children: [
-                Theme(
-                  data: ThemeData(unselectedWidgetColor: Colors.grey),
-                  child: Checkbox(
-                    value: _isAgreed,
-                    activeColor: Colors.cyanAccent,
-                    onChanged: (val) => setState(() => _isAgreed = val!),
-                  ),
+                Checkbox(
+                  value: _isAgreed,
+                  activeColor: Colors.cyanAccent,
+                  checkColor: Colors.black,
+                  side: const BorderSide(color: Colors.grey),
+                  onChanged: (val) => setState(() => _isAgreed = val!),
                 ),
                 const Expanded(
                   child: Text.rich(
                     TextSpan(
                       text: "I agree to the ",
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
                       children: [
                         TextSpan(
                           text: "Terms and Services",
@@ -110,35 +206,35 @@ class _SignUpScreenState extends State<SignUp> {
               ],
             ),
 
-            const Spacer(),
+            const SizedBox(height: 30),
 
-            // Sign Up Button
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  );
-                },
+                onPressed: _isLoading ? null : _handleSignUp,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00E5FF),
+                  disabledBackgroundColor: const Color(
+                    0xFF00E5FF,
+                  ).withOpacity(0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: Text(
-                  "Sign Up",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -147,14 +243,12 @@ class _SignUpScreenState extends State<SignUp> {
                   style: TextStyle(color: Colors.grey),
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  ),
                   child: const Text(
                     "Login",
                     style: TextStyle(
@@ -177,6 +271,8 @@ class _SignUpScreenState extends State<SignUp> {
     required String hint,
     bool isPassword = false,
     Widget? suffixIcon,
+    TextEditingController? con,
+    TextInputType keyboardType = TextInputType.text,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,6 +285,8 @@ class _SignUpScreenState extends State<SignUp> {
           ),
         ),
         TextField(
+          controller: con,
+          keyboardType: keyboardType,
           obscureText: isPassword && _obscurePassword,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
@@ -207,7 +305,7 @@ class _SignUpScreenState extends State<SignUp> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Colors.cyanAccent, width: 1),
+              borderSide: const BorderSide(color: Colors.cyanAccent),
             ),
           ),
         ),
