@@ -336,6 +336,38 @@ void showShareDialog(BuildContext context) {
                           Colors.cyan), // Telegram
                     ],
                   ),
+                  const SizedBox(height: 20),
+
+// 🎬 EPISODE TITLE
+const Text(
+  "Episode",
+  style: TextStyle(
+    color: Colors.white,
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+const SizedBox(height: 10),
+
+// 🔽 SEASON DROPDOWN (STATIC UI)
+Row(
+  children: const [
+    Text(
+      "Season 2",
+      style: TextStyle(color: Colors.white),
+    ),
+    SizedBox(width: 5),
+    Icon(Icons.keyboard_arrow_down, color: Colors.white),
+  ],
+),
+
+const SizedBox(height: 15),
+
+// 🎞 EPISODE LIST
+EpisodeCard(),
+SizedBox(height: 15),
+EpisodeCard(),
                 ],
               ),
             ),
@@ -355,4 +387,125 @@ Widget socialBtn(IconData icon, Color color) {
     ),
     child: Icon(icon, color: color),
   );
+}
+class EpisodeCard extends StatelessWidget {
+  const EpisodeCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1C1F3A),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          Row(
+            children: [
+
+              // 🎞 IMAGE + PLAY
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 100,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      image: const DecorationImage(
+                        image: AssetImage("assets/images/movie3.png"),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.play_arrow,
+                        color: Colors.white),
+                  ),
+                ],
+              ),
+
+              const SizedBox(width: 10),
+
+              // 📄 INFO
+              Expanded(
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+
+                    // 🏷 TAG + DOWNLOAD
+                    Row(
+                      children: [
+
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius:
+                                BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            "Premium",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12),
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF0D0F2C),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.download,
+                              color: Colors.orange, size: 18),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 5),
+
+                    const Text(
+                      "1h30m",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+
+                    const Text(
+                      "Episode 1",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // 📝 DESCRIPTION
+          const Text(
+            "Football player who longs to write his own music. It’s not all smiles for this hunk though after he gets involved with his music teacher.",
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
 }

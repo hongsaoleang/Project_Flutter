@@ -2,7 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:my_project/screens/authentication/choice.dart';
-
+import 'package:my_project/screens/detail/detail_page.dart';
+import 'package:my_project/screens/download/download_page.dart';
+import 'package:my_project/screens/popular/popular_movie_page.dart';
+import 'package:my_project/screens/trailer/trailer_page.dart';
 import 'firebase_options.dart';
 // Use the full package path to ensure the compiler finds it
 
@@ -33,6 +36,8 @@ class MyWidget extends StatelessWidget {
         brightness: Brightness.dark, 
         primaryColor: const Color(0xFF00E5FF),
       ),
+      darkTheme: ThemeData(),
+      color: Colors.amber,
     );
   }
 }
